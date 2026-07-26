@@ -11,7 +11,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $cvv = $_POST['cvv'] ?? '';
 
     if (empty($name) || empty($phone) || empty($address) || empty($card_number) || empty($exp_month) || empty($exp_year) || empty($cvv)) {
-        echo "❌ Please fill in all required fields!";
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => '❌ Please fill in all required fields!']);
         exit();
     }
 
@@ -20,12 +21,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("sssssss", $name, $phone, $address, $card_number, $exp_month, $exp_year, $cvv);
 
+    header('Content-Type: application/json');
+    
     if ($stmt->execute()) {
-        echo "✅ Order placed successfully!";
+        echo json_encode(['success' => true, 'message' => '✅ Order placed successfully!']);
     } else {
-        echo "❌ Error: " . $stmt->error;
+        echo json_encode(['success' => false, 'message' => '❌ Error: ' . $stmt->error]);
     }
 
     $stmt->close();
+    exit();
 }
 ?>
